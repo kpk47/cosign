@@ -15,6 +15,7 @@
 name: Test attest / verify-attestation
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ 'main', 'release-*' ]
 
