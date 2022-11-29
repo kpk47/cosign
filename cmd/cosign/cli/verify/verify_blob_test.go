@@ -572,9 +572,12 @@ func TestVerifyBlob(t *testing.T) {
 				KeyOpts: options.KeyOpts{
 					BundlePath: tt.bundlePath,
 					RekorURL:   testServer.URL},
-				Identities: []cosign.Identity{{Issuer: issuer, Subject: identity}},
-				IgnoreSCT:  true,
-				CertChain:  chainPath,
+				CertVerifyOptions: options.CertVerifyOptions{
+					CertOidcIssuer: issuer,
+					CertIdentity:   identity,
+				},
+				IgnoreSCT: true,
+				CertChain: chainPath,
 			}
 			blobPath := writeBlobFile(t, td, string(blobBytes), "blob.txt")
 			if tt.signature != "" {
@@ -1111,12 +1114,14 @@ func TestVerifyBlobCmdWithBundle(t *testing.T) {
 
 		// Verify command
 		cmd := VerifyBlobCmd{
-			CertOIDCIssuer: issuer,
-			CertEmail:      identity,
-			CertChain:      os.Getenv("SIGSTORE_ROOT_FILE"),
-			SigRef:         "", // Sig is fetched from bundle
-			KeyOpts:        options.KeyOpts{BundlePath: bundlePath, TSACertChainPath: tsaCertChainPath},
-			IgnoreSCT:      true,
+			CertVerifyOptions: options.CertVerifyOptions{
+				CertOidcIssuer: issuer,
+				CertIdentity:   identity,
+			},
+			CertChain: os.Getenv("SIGSTORE_ROOT_FILE"),
+			SigRef:    "", // Sig is fetched from bundle
+			KeyOpts:   options.KeyOpts{BundlePath: bundlePath, TSACertChainPath: tsaCertChainPath},
+			IgnoreSCT: true,
 		}
 		err = cmd.Exec(context.Background(), blobPath)
 		if err != nil {
